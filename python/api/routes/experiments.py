@@ -309,17 +309,17 @@ async def run_experiment(body: ExperimentConfig, request: Request):
             trend_id, datetime.now().date(), mention_total["cnt"],
         )
     # ─────────────────────────────────────────────────────────────────────────
-    # STEP 3.5 — Instagram via Bright Data
+    # STEP 3.5 — Instagram via instagram_data (personal API, not yet built)
     # ─────────────────────────────────────────────────────────────────────────
 
-    logger.info(f"[{key}] Step 3.5/5: Instagram via Bright Data")
+    logger.info(f"[{key}] Step 3.5/5: Instagram via instagram_data")
 
     try:
         instagram_source = await fetchrow(
             """
             SELECT id, config
             FROM sources
-            WHERE slug = 'instagram-brightdata'
+            WHERE slug = 'instagram_data'
             AND active = true
             LIMIT 1
             """
@@ -360,7 +360,7 @@ async def run_experiment(body: ExperimentConfig, request: Request):
         else:
             logger.info(
                 f"[{key}] Instagram skipped: "
-                "'instagram-brightdata' source not seeded"
+                "'instagram_data' source not active/seeded"
             )
 
     except Exception as e:

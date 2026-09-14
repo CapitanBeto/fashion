@@ -60,16 +60,19 @@ class SourceSeeder extends Seeder
                 'active'            => false,
             ],
             [
-                'name'              => 'Bright Data / Instagram',
-                'slug'              => 'instagram-brightdata',
-                'type'              => 'brightdata',
-                'reliability_score' => 85,
+                'name'              => 'Instagram Data (personal API — not yet built)',
+                'slug'              => 'instagram_data',
+                'type'              => 'instagram_data',
+                'reliability_score' => 0,
                 'config'            => json_encode([
-                    'dataset_id_profiles' => 'gd_l1vikfch901nx3by4',
-                    'dataset_id_posts'    => 'gd_lk5ns7kz21pck8jpis',
-                    'posts_per_account'   => 20,
+                    'posts_per_account' => 20,
                 ]),
-                'active'             => true,
+                // Placeholder, inactive until the personal instagram_data
+                // API (python/scrapers/instagram_data.py) is implemented.
+                // The experiment pipeline already skips it cleanly when
+                // inactive (python/api/routes/experiments.py, Step 3.5)
+                // instead of fabricating data.
+                'active'             => false,
             ],
         ];
 
@@ -195,56 +198,7 @@ class SourceSeeder extends Seeder
             );
         }
     }
-    // ─── Instagram accounts via Bright Data ──────────────────────────────────
-// These are the curated public accounts Fashion Intelligence monitors.
-// Replace/add accounts as the source universe evolves.
-
-$instagramAccounts = [
-    [
-        'handle' => 'supremenewyork',
-        'country_id' => $usId,
-        'priority' => 100,
-    ],
-    [
-        'handle' => 'stussy',
-        'country_id' => $usId,
-        'priority' => 95,
-    ],
-    [
-        'handle' => 'carharttwip',
-        'country_id' => $usId,
-        'priority' => 90,
-    ],
-    [
-        'handle' => 'salomon',
-        'country_id' => $usId,
-        'priority' => 85,
-    ],
-];
-
-foreach ($instagramAccounts as $account) {
-    DB::table('source_targets')->updateOrInsert(
-        [
-            'source_id' => $instagramId,
-            'target_type' => 'instagram_account',
-            'target_value' => $account['handle'],
-        ],
-        [
-            'source_id' => $instagramId,
-            'niche_id' => $streetwearNicheId,
-            'country_id' => $account['country_id'],
-            'target_type' => 'instagram_account',
-            'target_value' => $account['handle'],
-            'priority' => $account['priority'],
-            'frequency' => 'daily',
-            'depth' => 1,
-            'active' => true,
-            'config' => json_encode([
-                'posts_per_run' => 20,
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]
-    );
-}
+    // Instagram/Bright Data has no curated source_targets seeded — the
+    // source itself is inactive (see above), so this stays an empty,
+    // honest placeholder rather than a populated-but-disabled config.
 }

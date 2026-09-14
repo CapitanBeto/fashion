@@ -1,0 +1,85 @@
+{
+  "_readme": "Plantilla para completar manualmente. Rellena 'instagram_handle' verificando tú mismo cada cuenta en Instagram. Los campos 'source' documentan de dónde salió cada nombre (búsqueda web, fecha 2026-09-14) — no son datos verificados de Instagram, solo el punto de partida para que tú los busques.",
+  "brands": [
+    {
+      "name": "Nude Project",
+      "country": "ES",
+      "instagram_handle": "",
+      "role": "brand",
+      "source": "web search — ya en brands seeder (streetwear_chile_espana informe)"
+    },
+    {
+      "name": "Scuffers",
+      "country": "ES",
+      "instagram_handle": "",
+      "role": "brand",
+      "source": "web search — ya en brands seeder"
+    },
+    {
+      "name": "Eme Studios",
+      "country": "ES",
+      "instagram_handle": "",
+      "role": "brand",
+      "source": "web search — fundada por 5 amigos, Madrid, 2019"
+    },
+    {
+      "name": "Cold Culture",
+      "country": "ES",
+      "instagram_handle": "",
+      "role": "brand",
+      "source": "web search — Madrid, fundada 2021"
+    },
+    {
+      "name": "Sisyphe",
+      "country": "ES",
+      "instagram_handle": "",
+      "role": "brand",
+      "source": "web search — fundador mencionado solo como 'Pablo', verificar"
+    },
+    {
+      "name": "Stodak",
+      "country": "CL",
+      "instagram_handle": "",
+      "instagram_handle_tiktok_seen": "stodakwrld",
+      "role": "brand",
+      "source": "web search (TikTok) — Franklin, Santiago; ya en brands seeder"
+    },
+    {
+      "name": "Treino",
+      "country": "CL",
+      "instagram_handle": "",
+      "instagram_handle_tiktok_seen": "treinoficial",
+      "role": "brand",
+      "source": "web search (TikTok) — ya en brands seeder"
+    },
+    {
+      "name": "Human Mob",
+      "country": "CL",
+      "instagram_handle": "",
+      "role": "brand",
+      "source": "web search (Facebook) — ya en brands seeder"
+    }
+  ],
+  "founders_and_creative_directors": [
+    { "name": "Bruno Casanovas", "brand": "Nude Project", "country": "ES", "instagram_handle": "" },
+    { "name": "Àlex Benlloch", "brand": "Nude Project", "country": "ES", "instagram_handle": "" },
+    { "name": "Jaime Cruz", "brand": "Scuffers", "country": "ES", "instagram_handle": "" },
+    { "name": "Javier López", "brand": "Scuffers", "country": "ES", "instagram_handle": "" },
+    { "name": "Jano Gebert", "brand": "Treino", "role": "director creativo", "country": "CL", "instagram_handle": "" },
+    { "name": "Pablo (apellido sin confirmar)", "brand": "Sisyphe", "country": "ES", "instagram_handle": "", "note": "verificar identidad completa" }
+  ],
+  "musicians_cultural_anchors": [
+    { "name": "Rauw Alejandro", "associated_brand": "Nude Project", "country": "PR/ES", "instagram_handle": "", "source": "informe streetwear_chile_espana" },
+    { "name": "Kidd Keo", "associated_brand": "Nude Project", "country": "ES", "instagram_handle": "", "source": "informe streetwear_chile_espana" },
+    { "name": "Arón Piper", "associated_brand": "Scuffers", "country": "ES", "instagram_handle": "", "source": "informe streetwear_chile_espana" },
+    { "name": "Milo J", "associated_brand": "Stodak", "country": "AR", "instagram_handle": "", "source": "informe — adoptó Stodak en Festival de Viña" },
+    { "name": "Alexander Azukar", "associated_brand": "Treino", "country": "CL", "instagram_handle": "", "source": "informe — colab drop HITOH" }
+  ],
+  "fashion_content_creators_chile_unverified": [
+    { "name": "vedelia_donoso", "instagram_handle": "vedelia_donoso", "note": "aparece en rankings de influencers de moda Chile — VERIFICAR relevancia streetwear específica, no solo moda general" },
+    { "name": "ayllenoliver", "instagram_handle": "ayllenoliver", "note": "idem — verificar" },
+    { "name": "judequeker_", "instagram_handle": "judequeker_", "note": "idem — verificar" },
+    { "name": "ivetteespinozab", "instagram_handle": "ivetteespinozab", "note": "idem — verificar" },
+    { "name": "javicorreamedina", "instagram_handle": "javicorreamedina", "note": "idem — verificar" }
+  ]
+}

@@ -70,7 +70,7 @@ return [
                 'password'      => env('DECODO_PASSWORD'),
                 'cost_per_req'  => 0.001_00,
             ],
-            'brightdata' => [
+            'fashionapi' => [
                 'api_key'       => env('BRIGHTDATA_API_KEY'),
                 'cost_per_req'  => 0.002_00,
             ],

@@ -1,9 +1,9 @@
 """
-Instagram ingestion through Bright Data.
+Instagram ingestion through Fashion Data API.
 
-Reads Instagram accounts from source_targets, asks Bright Data to discover
-recent posts from those profiles, normalizes the returned records and stores
-them in raw_documents + raw_posts.
+Reads Instagram accounts from source_targets, asks the Fashion Data API to
+discover recent posts from those profiles, normalizes the returned records
+and stores them in raw_documents + raw_posts.
 
 The existing NLP pipeline then processes the resulting raw_documents exactly
 like Reddit and Web content.
@@ -17,7 +17,7 @@ from datetime import datetime
 from typing import Any
 
 from db.client import execute, fetch, fetchrow
-from scrapers.brightdata import (
+from scrapers.fashionapi import (
     discover_posts_by_profiles,
     is_configured,
 )
@@ -25,11 +25,11 @@ from scrapers.brightdata import (
 logger = logging.getLogger(__name__)
 
 DEFAULT_BATCH_SIZE = int(
-    os.getenv("BRIGHTDATA_BATCH_SIZE", "50")
+    os.getenv("FASHION_API_BATCH_SIZE", "50")
 )
 
 DEFAULT_POSTS_PER_ACCOUNT = int(
-    os.getenv("BRIGHTDATA_POSTS_PER_ACCOUNT", "20")
+    os.getenv("FASHION_API_POSTS_PER_ACCOUNT", "20")
 )
 
 
@@ -52,7 +52,7 @@ def _instagram_profile_url(value: str) -> str:
 
 
 def _parse_datetime(value: Any) -> datetime | None:
-    """Convert Bright Data's ISO timestamp to a Python datetime."""
+    """Convert Instagram's ISO timestamp to a Python datetime."""
 
     if not value:
         return None
@@ -77,13 +77,7 @@ def _parse_datetime(value: Any) -> datetime | None:
 
 
 def _normalize_post(raw: dict[str, Any]) -> dict[str, Any]:
-    """
-    Normalize Bright Data's Instagram Posts response.
-
-    Bright Data's current Instagram Posts output includes fields such as:
-    url, user_posted, description, hashtags, num_comments, date_posted,
-    likes and photos.
-    """
+    """Normalize the Fashion Data API Instagram Posts response."""
 
     url = (
         raw.get("url")
@@ -230,12 +224,12 @@ async def _save_post(
         return False
 
     metadata = {
-        "provider": "brightdata",
+        "provider": "fashion-data-api",
         "platform": "instagram",
         "hashtags": post["hashtags"],
         "likes": post["likes"],
         "photos": post["image_urls"],
-        "brightdata": post["raw"],
+        "source_data": post["raw"],
     }
 
     document_row = await fetchrow(
@@ -389,7 +383,7 @@ async def scrape_instagram_targets(
 
     if not is_configured():
         logger.warning(
-            "Instagram skipped: BRIGHTDATA_API_TOKEN is not configured."
+            "Instagram skipped: FASHION_DATA_API_URL is not configured."
         )
         return empty_stats
 
@@ -430,7 +424,7 @@ async def scrape_instagram_targets(
         ]
 
         logger.info(
-            "Instagram/Bright Data: discovering posts for %s accounts",
+            "Instagram/Fashion API: discovering posts for %s accounts",
             len(batch),
         )
 
@@ -450,7 +444,7 @@ async def scrape_instagram_targets(
             stats["failed"] += len(batch)
 
             logger.exception(
-                "Bright Data Instagram batch failed: %s",
+                "Fashion API Instagram batch failed: %s",
                 exc,
             )
 
@@ -470,9 +464,9 @@ async def scrape_instagram_targets(
                         (
                             $1,
                             $2,
-                            'brightdata_request_failed',
+                            ''fashion_api_request_failed'',
                             $3,
-                            'brightdata',
+                            'fashion-data-api',
                             NOW()
                         )
                     """,
