@@ -59,6 +59,18 @@ class SourceSeeder extends Seeder
                 'config'            => json_encode(['geolocation' => 'US', 'javascript_rendering' => false]),
                 'active'            => false,
             ],
+            [
+                'name'              => 'Bright Data / Instagram',
+                'slug'              => 'instagram-brightdata',
+                'type'              => 'brightdata',
+                'reliability_score' => 85,
+                'config'            => json_encode([
+                    'dataset_id_profiles' => 'gd_l1vikfch901nx3by4',
+                    'dataset_id_posts'    => 'gd_lk5ns7kz21pck8jpis',
+                    'posts_per_account'   => 20,
+                ]),
+                'active'             => true,
+            ],
         ];
 
         foreach ($sources as $source) {
@@ -72,7 +84,9 @@ class SourceSeeder extends Seeder
         $redditId       = DB::table('sources')->where('slug', 'reddit')->value('id');
         $googleTrendsId = DB::table('sources')->where('slug', 'google-trends')->value('id');
         $webCrawlerId   = DB::table('sources')->where('slug', 'web-crawler')->value('id');
-
+        $instagramId = DB::table('sources')
+            ->where('slug', 'instagram-brightdata')
+            ->value('id');
         $streetwearNicheId = DB::table('niches')->where('slug', 'streetwear')->value('id');
         $usId  = DB::table('countries')->where('iso2', 'US')->value('id');
         $gbId  = DB::table('countries')->where('iso2', 'GB')->value('id');
@@ -181,4 +195,56 @@ class SourceSeeder extends Seeder
             );
         }
     }
+    // ─── Instagram accounts via Bright Data ──────────────────────────────────
+// These are the curated public accounts Fashion Intelligence monitors.
+// Replace/add accounts as the source universe evolves.
+
+$instagramAccounts = [
+    [
+        'handle' => 'supremenewyork',
+        'country_id' => $usId,
+        'priority' => 100,
+    ],
+    [
+        'handle' => 'stussy',
+        'country_id' => $usId,
+        'priority' => 95,
+    ],
+    [
+        'handle' => 'carharttwip',
+        'country_id' => $usId,
+        'priority' => 90,
+    ],
+    [
+        'handle' => 'salomon',
+        'country_id' => $usId,
+        'priority' => 85,
+    ],
+];
+
+foreach ($instagramAccounts as $account) {
+    DB::table('source_targets')->updateOrInsert(
+        [
+            'source_id' => $instagramId,
+            'target_type' => 'instagram_account',
+            'target_value' => $account['handle'],
+        ],
+        [
+            'source_id' => $instagramId,
+            'niche_id' => $streetwearNicheId,
+            'country_id' => $account['country_id'],
+            'target_type' => 'instagram_account',
+            'target_value' => $account['handle'],
+            'priority' => $account['priority'],
+            'frequency' => 'daily',
+            'depth' => 1,
+            'active' => true,
+            'config' => json_encode([
+                'posts_per_run' => 20,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]
+    );
+}
 }
