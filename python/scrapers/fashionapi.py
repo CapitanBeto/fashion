@@ -6,15 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FASHION_DATA_API_URL = os.getenv(
-    "FASHION_DATA_API_URL",
-    "http://127.0.0.1:8000",
-).rstrip("/")
+FASHION_DATA_API_URL = os.getenv("FASHION_DATA_API_URL")
 
+if FASHION_DATA_API_URL:
+    FASHION_DATA_API_URL = FASHION_DATA_API_URL.rstrip("/")
 
 def is_configured() -> bool:
     return bool(FASHION_DATA_API_URL)
-
 
 async def discover_posts_by_profiles(
     profiles: list[str],
@@ -76,14 +74,16 @@ async def discover_posts_by_profiles(
         if not isinstance(profile, dict):
             continue
 
-        username = (
-            profile.get("user_name")
-            or profile.get("username")
-            or profile.get("name")
-            or ""
-        )
+        account = profile.get("account", {})
 
-        profile_posts = profile.get("posts", [])
+        if not isinstance(account, dict):
+            continue
+
+        username = account.get("username", "")
+
+        profile_posts = profile.get("content", [])
+
+
 
         if not isinstance(profile_posts, list):
             continue
@@ -94,20 +94,19 @@ async def discover_posts_by_profiles(
                 continue
 
             normalized = {
-                "post_id": post.get("id"),
-                "url": post.get("url"),
+                "post_id": post.get("content_id"),
+                "url": post.get("permalink"),
                 "user_posted": username,
-                "description": post.get("caption"),
-                "hashtags": post.get("post_hashtags"),
-                "date_posted": post.get("datetime"),
-                "likes": post.get("likes"),
-                "num_comments": post.get("comments"),
-                "photos": (
-                    [post["image_url"]]
-                    if post.get("image_url")
-                    else []
-                ),
-                "raw": post,
+                "description": post.get("text"),
+                "hashtags": post.get("tags", []),
+                "date_posted": post.get("published"),
+                "likes": post.get("engagement", {}).get("likes"),
+                "num_comments": post.get("engagement", {}).get("comments"),
+                "photos": [
+                    media.get("url")
+                    for media in post.get("media", [])
+                    if isinstance(media, dict) and media.get("url")
+                ],
             }
 
             posts.append(normalized)

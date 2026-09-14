@@ -552,7 +552,7 @@ async def scrape_instagram_targets(
                             $2,
                             'save_failed',
                             $3,
-                            'brightdata',
+                            'fashion-data-api',
                             NOW()
                         )
                     """,

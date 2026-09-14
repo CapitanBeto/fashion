@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100);
             $table->string('slug', 100)->unique();
-            // google_trends | reddit | web | apify | scraperapi | zyte | oxylabs | decodo | brightdata
+            // google_trends | reddit | web | apify | scraperapi | zyte | oxylabs | decodo | fashion_data_api
             $table->string('type', 50);
             $table->json('config')->default('{}');
             $table->integer('reliability_score')->default(50); // 0-100

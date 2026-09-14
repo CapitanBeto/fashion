@@ -60,19 +60,18 @@ class SourceSeeder extends Seeder
                 'active'            => false,
             ],
             [
-                'name'              => 'Instagram Data (personal API — not yet built)',
-                'slug'              => 'instagram_data',
-                'type'              => 'instagram_data',
-                'reliability_score' => 0,
+                'name'              => 'Fashion Data API (Instagram — personal, local)',
+                'slug'              => 'fashion-data-api',
+                'type'              => 'fashion_data_api',
+                'reliability_score' => 60,
                 'config'            => json_encode([
                     'posts_per_account' => 20,
                 ]),
-                // Placeholder, inactive until the personal instagram_data
-                // API (python/scrapers/instagram_data.py) is implemented.
-                // The experiment pipeline already skips it cleanly when
-                // inactive (python/api/routes/experiments.py, Step 3.5)
-                // instead of fabricating data.
-                'active'             => false,
+                // Backed by python/scrapers/fashionapi.py, which calls the
+                // user's own local server (FASHION_DATA_API_URL) serving
+                // manually-collected Instagram data — no third-party
+                // scraping/bot-evasion service involved.
+                'active'             => true,
             ],
         ];
 
@@ -88,7 +87,7 @@ class SourceSeeder extends Seeder
         $googleTrendsId = DB::table('sources')->where('slug', 'google-trends')->value('id');
         $webCrawlerId   = DB::table('sources')->where('slug', 'web-crawler')->value('id');
         $instagramId = DB::table('sources')
-            ->where('slug', 'instagram-brightdata')
+            ->where('slug', 'fashion-data-api')
             ->value('id');
         $streetwearNicheId = DB::table('niches')->where('slug', 'streetwear')->value('id');
         $usId  = DB::table('countries')->where('iso2', 'US')->value('id');
@@ -197,8 +196,42 @@ class SourceSeeder extends Seeder
                 ]
             );
         }
+
+        // Instagram accounts, via fashion-data-api. Only handles actually
+        // confirmed as Instagram usernames (from fashion-influencer
+        // ranking sites) are seeded here — the TikTok-only handles seen
+        // for Stodak/Treino are NOT included since their Instagram handle
+        // was never confirmed.
+        $instagramAccounts = [
+            ['handle' => 'vedelia_donoso',    'priority' => 90],
+            ['handle' => 'ayllenoliver',      'priority' => 85],
+            ['handle' => 'judequeker_',       'priority' => 80],
+            ['handle' => 'ivetteespinozab',   'priority' => 75],
+            ['handle' => 'javicorreamedina',  'priority' => 70],
+        ];
+
+        foreach ($instagramAccounts as $account) {
+            DB::table('source_targets')->updateOrInsert(
+                [
+                    'source_id'    => $instagramId,
+                    'target_type'  => 'instagram_account',
+                    'target_value' => $account['handle'],
+                ],
+                [
+                    'source_id'    => $instagramId,
+                    'niche_id'     => $streetwearNicheId,
+                    'country_id'   => $clId,
+                    'target_type'  => 'instagram_account',
+                    'target_value' => $account['handle'],
+                    'priority'     => $account['priority'],
+                    'frequency'    => 'daily',
+                    'depth'        => 1,
+                    'active'       => true,
+                    'config'       => json_encode(['posts_per_run' => 20]),
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ]
+            );
+        }
     }
-    // Instagram/Bright Data has no curated source_targets seeded — the
-    // source itself is inactive (see above), so this stays an empty,
-    // honest placeholder rather than a populated-but-disabled config.
 }

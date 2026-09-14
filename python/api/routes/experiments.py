@@ -309,17 +309,18 @@ async def run_experiment(body: ExperimentConfig, request: Request):
             trend_id, datetime.now().date(), mention_total["cnt"],
         )
     # ─────────────────────────────────────────────────────────────────────────
-    # STEP 3.5 — Instagram via instagram_data (personal API, not yet built)
+    # STEP 3.5 — Instagram via fashion-data-api (personal, local, manually
+    # populated — see python/scrapers/fashionapi.py)
     # ─────────────────────────────────────────────────────────────────────────
 
-    logger.info(f"[{key}] Step 3.5/5: Instagram via instagram_data")
+    logger.info(f"[{key}] Step 3.5/5: Instagram via fashion-data-api")
 
     try:
         instagram_source = await fetchrow(
             """
             SELECT id, config
             FROM sources
-            WHERE slug = 'instagram_data'
+            WHERE slug = 'fashion-data-api'
             AND active = true
             LIMIT 1
             """
@@ -360,7 +361,7 @@ async def run_experiment(body: ExperimentConfig, request: Request):
         else:
             logger.info(
                 f"[{key}] Instagram skipped: "
-                "'instagram_data' source not active/seeded"
+                "'fashion-data-api' source not active/seeded"
             )
 
     except Exception as e:
