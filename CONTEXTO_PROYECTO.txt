@@ -1,0 +1,307 @@
+# FASHION INTELLIGENCE — CONTEXTO COMPLETO DEL PROYECTO
+# Documento para continuar el proyecto en otra sesión de Claude
+# Creado: Septiembre 2026
+
+---
+
+## QUÉ ES ESTE PROYECTO
+
+Fashion Intelligence es una plataforma de detección de microtrends de moda.
+Monitorea señales de internet (Google Trends, Reddit, webs de marcas) para detectar
+tendencias emergentes antes de que lleguen al mainstream, calcula scores de oportunidad
+comercial, y usa un LLM local (Ollama/Qwen3) para generar conceptos de producto concretos.
+
+El primer experimento es sobre hoodies streetwear (hoodie_test_01):
+11 keywords × 3 países (US, GB, CL) × 7 subreddits de Reddit.
+
+---
+
+## STACK TÉCNICO
+
+- Backend: Laravel 11 (PHP 8.4) — API REST + Dashboard Livewire
+- Data Engine: FastAPI (Python 3.11) — Scraping + NLP + Scoring + LLM
+- Base de datos: PostgreSQL 18 (compartida entre Laravel y Python)
+- LLM: Ollama local con modelo Qwen3:8b (gratuito, corre en la máquina)
+- Queue: Laravel Queue con driver database
+- Frontend: Livewire 3 + Tailwind CDN (MVP, sin compilación)
+
+---
+
+## AMBIENTE DEL USUARIO
+
+- OS: Windows (CMD, no PowerShell preferido)
+- PHP: 8.4.25 (via Laravel Herd)
+- Composer: 2.10.2
+- Laravel Installer: 5.31.1
+- Node.js: 26.8.2
+- Python: 3.11.8
+- PostgreSQL: 18.6
+- Ollama: 0.34.0
+- Git: 2.55.0
+- Ruta base del proyecto: C:\fashion\fashion\
+
+---
+
+## ESTADO ACTUAL — QUÉ SE HIZO Y QUÉ FALTA
+
+### ✅ COMPLETADO
+
+1. BASE DE DATOS PostgreSQL
+   - Database creada: fashion_intelligence
+   - Usuario creado: fi_user / fi_password_2024
+   - Permisos otorgados
+   - uuid-ossp extension activada
+   - pgvector NO instalada (opcional, se salta en migración)
+
+2. CÓDIGO GENERADO (todos los archivos están en este ZIP)
+   - 6 migraciones de BD (35+ tablas)
+   - 25 modelos Eloquent
+   - 3 Jobs (RunExperimentJob, ProcessDocumentJob, CalculateScoresJob)
+   - PythonEngineClient (servicio HTTP Laravel→Python)
+   - 4 Controllers API (Auth, Trend, Experiment, Source)
+   - 3 API Resources (Trend, CommercialOpportunity, ScrapeRun)
+   - Rutas API y Web
+   - 11 Seeders con datos reales
+   - 3 componentes Livewire (TrendDashboard, TrendDetail, ExperimentPanel)
+   - 10 vistas Blade
+   - Python engine completo:
+     * FastAPI app (api/main.py)
+     * Google Trends scraper (pytrends)
+     * Reddit scraper (PRAW)
+     * HTTP scraper base (httpx + BeautifulSoup)
+     * NLP extractor (spaCy + LLM)
+     * Momentum scorer
+     * Creative Director LLM module
+     * DB client (asyncpg)
+
+3. ARCHIVOS DE CONFIGURACIÓN
+   - .env.example completo
+   - config/fashion.php
+   - bootstrap/app.php
+   - composer.json con todas las dependencias
+   - requirements.txt Python
+
+### ❌ PENDIENTE (siguiente sesión empieza aquí)
+
+El usuario quedó en el paso de crear el proyecto Laravel base:
+
+```
+cd C:\fashion\fashion
+laravel new fashion-intelligence-backend
+```
+
+Respuestas al wizard:
+- Starter kit: No starter kit
+- Testing: PHPUnit
+- Database: PostgreSQL
+- Run migrations: no
+
+DESPUÉS de crear el proyecto, los pasos son:
+
+PASO A — Copiar archivos del ZIP al proyecto
+  Los archivos de la carpeta "laravel/" del ZIP van a:
+  C:\fashion\fashion\fashion-intelligence-backend\
+
+PASO B — Instalar dependencias
+  cd C:\fashion\fashion\fashion-intelligence-backend
+  composer install
+  php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+  php artisan livewire:publish --config
+
+PASO C — Configurar .env
+  copy .env.example .env
+  php artisan key:generate
+  Editar .env: DB_PASSWORD=fi_password_2024, ADMIN_EMAIL, ADMIN_PASSWORD
+
+PASO D — Migrar y seedear
+  php artisan migrate
+  php artisan db:seed
+
+PASO E — Levantar Laravel
+  Terminal 1: php artisan serve
+  Terminal 2: php artisan queue:work --queue=experiments,scoring,default --tries=3
+
+PASO F — Python engine
+  mkdir C:\fashion\data-engine
+  cd C:\fashion\data-engine
+  Copiar archivos de la carpeta "python/" del ZIP
+  python -m venv venv
+  venv\Scripts\activate
+  pip install -r requirements.txt
+  python -m spacy download en_core_web_sm
+  copy .env.example .env
+  (editar .env con mismas credenciales de BD)
+  Terminal 3: ollama serve
+  Terminal 4: uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload
+
+PASO G — Primer experimento
+  php artisan experiment:run hoodie_test_01 --sync
+
+---
+
+## ESTRUCTURA DE CARPETAS DEL PROYECTO
+
+```
+C:\fashion\fashion\
+├── fashion-intelligence-backend\     ← Proyecto Laravel
+│   ├── app\
+│   │   ├── Console\Commands\RunExperimentCommand.php
+│   │   ├── Console\Kernel.php
+│   │   ├── Http\Controllers\Api\AuthController.php
+│   │   ├── Http\Controllers\Api\ExperimentController.php
+│   │   ├── Http\Controllers\Api\SourceController.php
+│   │   ├── Http\Controllers\Api\TrendController.php
+│   │   ├── Http\Controllers\Auth\LoginController.php
+│   │   ├── Http\Resources\CommercialOpportunityResource.php
+│   │   ├── Http\Resources\ScrapeRunResource.php
+│   │   ├── Http\Resources\TrendResource.php
+│   │   ├── Jobs\CalculateScoresJob.php
+│   │   ├── Jobs\ProcessDocumentJob.php
+│   │   ├── Jobs\RunExperimentJob.php
+│   │   ├── Livewire\ExperimentPanel.php
+│   │   ├── Livewire\TrendDashboard.php
+│   │   ├── Livewire\TrendDetail.php
+│   │   ├── Models\ (25 modelos)
+│   │   ├── Providers\AppServiceProvider.php
+│   │   └── Services\PythonEngineClient.php
+│   ├── bootstrap\app.php
+│   ├── config\fashion.php
+│   ├── database\
+│   │   ├── migrations\ (6 archivos)
+│   │   └── seeders\ (11 archivos)
+│   ├── resources\views\
+│   │   ├── auth\login.blade.php
+│   │   ├── layouts\app.blade.php
+│   │   ├── livewire\ (5 vistas)
+│   │   └── placeholder.blade.php
+│   ├── routes\api.php
+│   ├── routes\web.php
+│   ├── routes\console.php
+│   ├── .env.example
+│   └── composer.json
+│
+└── data-engine\                      ← Python Engine
+    ├── api\
+    │   ├── main.py
+    │   └── routes\experiments.py, trends.py
+    ├── db\client.py
+    ├── llm\client.py, creative_director.py
+    ├── nlp\entity_extractor.py
+    ├── scrapers\base.py, google_trends.py, reddit.py
+    ├── scoring\momentum.py
+    ├── .env.example
+    └── requirements.txt
+```
+
+---
+
+## BASE DE DATOS — TABLAS CREADAS POR LAS MIGRACIONES
+
+Migración 1 (reference): countries, niches, silhouettes, graphics, colors,
+  materials, scoring_parameters, prompt_versions
+
+Migración 2 (sources): sources, source_targets, scrape_runs,
+  scraping_errors, data_quality_logs
+
+Migración 3 (raw_data): raw_documents, raw_posts, raw_products, raw_images
+
+Migración 4 (entities): brands, products, creators, communities,
+  entities, entity_relationships, price_observations, collaborations
+
+Migración 5 (trends): trends, trend_mentions, trend_snapshots,
+  trend_lifecycle, brand_trends, creator_trends, product_trends,
+  trend_countries, trend_colors, trend_silhouettes, trend_graphics,
+  engagement_metrics, search_metrics
+
+Migración 6 (intelligence): commercial_opportunities, competitors,
+  content_features, advertising_patterns, trend_predictions,
+  prediction_outcomes, model_runs
+
+NOTA: La migración 1 tiene una línea que intenta crear la extensión "vector"
+(pgvector). En Windows esa línea falla. Ya fue modificada en los archivos
+de este ZIP para usar try/catch y no romper la migración.
+
+---
+
+## CREDENCIALES Y VARIABLES CLAVE
+
+PostgreSQL:
+  host: 127.0.0.1
+  port: 5432
+  database: fashion_intelligence
+  username: fi_user
+  password: fi_password_2024
+
+Laravel .env (valores a completar):
+  APP_KEY: (generado con php artisan key:generate)
+  ADMIN_EMAIL: (el usuario elige)
+  ADMIN_PASSWORD: (el usuario elige)
+  PYTHON_ENGINE_SECRET: (string aleatorio largo, mismo en ambos .env)
+
+Python engine .env:
+  DATABASE_URL: postgresql://fi_user:fi_password_2024@localhost:5432/fashion_intelligence
+  ENGINE_SECRET: (mismo que PYTHON_ENGINE_SECRET en Laravel)
+
+---
+
+## DECISIONES DE DISEÑO IMPORTANTES
+
+1. pgvector es OPCIONAL. El sistema lo detecta y lo salta si no está.
+   Los embeddings de imágenes son una función futura.
+
+2. Modo FREE por defecto. SCRAPE_MODE=FREE significa solo HTTP local
+   y Reddit API oficial. Sin costo de scraping.
+
+3. LLM local (Ollama). Privacy-first. Los datos nunca salen de la máquina.
+   Fallback a spaCy si Ollama no está corriendo.
+
+4. Sin npm/build en MVP. Tailwind via CDN para simplificar el setup.
+   En producción se compila con npm run build.
+
+5. Queue driver: database. Sin Redis necesario para empezar.
+   php artisan queue:work procesa los jobs.
+
+6. Los dos servicios (Laravel en :8000, Python en :8001) comparten
+   la misma BD PostgreSQL. Se comunican via HTTP con un shared secret.
+
+---
+
+## EXPERIMENTO INICIAL CONFIGURADO
+
+Nombre: hoodie_test_01
+Nicho: streetwear
+Países: US, GB, CL
+Período: 180 días
+Keywords (11):
+  oversized hoodie, zip hoodie, washed hoodie, heavyweight hoodie,
+  boxy hoodie, graphic hoodie, cropped hoodie, technical hoodie,
+  vintage hoodie, distressed hoodie, full zip hoodie
+Subreddits (7):
+  streetwear, malefashionadvice, fashion, skateboarding,
+  streetwearstartup, frugalmalefashion, sneakers
+
+---
+
+## CÓMO INICIAR LA SIGUIENTE SESIÓN
+
+Dile al nuevo Claude exactamente esto:
+
+"Estoy construyendo Fashion Intelligence, una plataforma de detección
+de microtrends de moda. Stack: Laravel 11 + Python FastAPI + PostgreSQL 18
++ Ollama (Qwen3:8b). Tengo Windows con PHP 8.4, Python 3.11, PostgreSQL 18
+y Ollama instalados. La base de datos ya está creada. Tengo todos los
+archivos de código generados en un ZIP. Necesito continuar desde el punto
+donde quedé: crear el proyecto Laravel con 'laravel new' y copiar los
+archivos del ZIP. Lee el archivo CONTEXTO_PROYECTO.txt del ZIP para
+el estado completo."
+
+---
+
+## ARCHIVOS EN ESTE ZIP
+
+ZIP estructura:
+  CONTEXTO_PROYECTO.txt          ← este archivo (leer primero)
+  IMPLEMENTACION.md              ← guía detallada paso a paso
+  laravel/                       ← todos los archivos del backend Laravel
+  python/                        ← todos los archivos del Python engine
+  sql/setup_db.sql               ← script SQL de setup de BD

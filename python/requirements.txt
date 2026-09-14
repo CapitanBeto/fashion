@@ -1,0 +1,61 @@
+# Fashion Intelligence — Python Engine Dependencies
+# Instalar con: pip install -r requirements.txt
+
+# ── API Framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# ── Database ──────────────────────────────────────────────────────────────────
+asyncpg==0.30.0
+sqlalchemy[asyncio]==2.0.36
+psycopg2-binary==2.9.10
+pgvector==0.3.6
+
+# ── HTTP / Scraping ───────────────────────────────────────────────────────────
+httpx==0.28.1
+aiohttp==3.11.10
+beautifulsoup4==4.12.3
+lxml==5.3.0
+playwright==1.49.0
+fake-useragent==1.5.1
+python-dateutil==2.9.0.post0
+
+# ── Google Trends ─────────────────────────────────────────────────────────────
+pytrends==4.9.2
+# pytrends 4.9.2 still calls urllib3's Retry(method_whitelist=...), which was
+# removed in urllib3 2.0 (renamed to allowed_methods) — pin urllib3<2 so
+# Google Trends requests don't silently fail on every batch.
+urllib3<2
+
+# ── Reddit ────────────────────────────────────────────────────────────────────
+praw==7.8.1
+
+# ── NLP ───────────────────────────────────────────────────────────────────────
+spacy==3.8.3
+# After install: python -m spacy download en_core_web_sm
+rapidfuzz==3.10.1
+
+# ── ML / Forecasting ─────────────────────────────────────────────────────────
+scikit-learn==1.5.2
+xgboost==2.1.3
+prophet==1.1.6
+numpy==1.26.4
+pandas==2.2.3
+
+# ── LLM ───────────────────────────────────────────────────────────────────────
+# Note: the Ollama backend in llm/client.py talks to the local Ollama server
+# directly over httpx (POST /api/chat) — it does not use the `ollama` pip
+# package, which was unused and pinned to httpx<0.28, conflicting with the
+# httpx==0.28.1 pin above. Removed rather than downgrading httpx.
+openai==1.58.1        # también para Anthropic-compatible endpoints
+anthropic==0.40.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+tenacity==9.0.0       # retries con backoff exponencial
+structlog==24.4.0     # logging estructurado
+python-multipart==0.0.20
+pillow==11.0.0        # procesamiento de imágenes
+imagehash==4.3.1      # perceptual hashing (dedup de imágenes)
