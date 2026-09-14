@@ -71,7 +71,7 @@ return [
                 'cost_per_req'  => 0.001_00,
             ],
             'fashionapi' => [
-                'api_key'       => env('BRIGHTDATA_API_KEY'),
+                'api_key'       => env('FASHION_DATA_API_URL'),
                 'cost_per_req'  => 0.002_00,
             ],
         ],
