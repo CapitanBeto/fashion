@@ -70,10 +70,6 @@ return [
                 'password'      => env('DECODO_PASSWORD'),
                 'cost_per_req'  => 0.001_00,
             ],
-            'fashionapi' => [
-                'url'          => env('FASHION_DATA_API_URL'),
-                'cost_per_req' => 0.002_00,
-            ],
         ],
     ],
 

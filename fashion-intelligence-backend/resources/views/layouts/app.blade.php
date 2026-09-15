@@ -84,6 +84,7 @@
                         ['route' => 'opportunities','label' => 'Opportunities'],
                         ['route' => 'experiments',  'label' => 'Experiments'],
                         ['route' => 'sources',      'label' => 'Sources'],
+                        ['route' => 'instagram-network', 'label' => 'Instagram Network'],
                     ] as $link)
                         <a href="{{ route($link['route']) }}"
                            class="px-3 py-1.5 rounded text-sm transition-colors

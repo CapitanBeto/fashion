@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\ChileFashionRadar;
+use App\Livewire\InstagramNetwork;
 use App\Livewire\ProductDeepDive;
 use App\Livewire\TrendDashboard;
 use App\Livewire\TrendDetail;
@@ -36,6 +37,8 @@ Route::middleware('auth')->group(function () {
     })->name('opportunities');
 
     Route::get('/experiments', ExperimentPanel::class)->name('experiments');
+
+    Route::get('/instagram-network', InstagramNetwork::class)->name('instagram-network');
 
     Route::get('/sources', function () {
         // Placeholder — full SourceManager Livewire component is Phase B+

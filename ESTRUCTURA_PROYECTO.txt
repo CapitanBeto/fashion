@@ -1,0 +1,87 @@
+FASHION INTELLIGENCE — ESTRUCTURA DEL PROYECTO (resumen simple)
+================================================================
+
+Monorepo con dos partes: Laravel (web/dashboard) + Python (motor de datos).
+Laravel llama a Python vía HTTP; ambos comparten la misma base PostgreSQL.
+
+/
+├── README.md                          — descripción corta del proyecto
+├── IMPLEMENTACION.md                  — notas de implementación
+├── INFORME_SISTEMA.md                 — informe de estado del sistema
+├── CONTEXTO_PROYECTO.txt              — contexto/histórico del proyecto
+├── sql/setup_db.sql                   — script de creación de la BD
+│
+├── fashion-intelligence-backend/      — LARAVEL (dashboard + API + jobs)
+│   ├── app/
+│   │   ├── Console/Commands/          — comandos artisan
+│   │   │   ├── RunExperimentCommand.php       — corre un experimento completo
+│   │   │   ├── ForecastChileCommand.php       — genera forecast Chile 60d
+│   │   │   ├── EvaluatePredictionsCommand.php — backtesting de predicciones
+│   │   │   └── TrendsBacktestCommand.php      — backtest histórico
+│   │   ├── Http/Controllers/
+│   │   │   ├── Api/                   — endpoints API (Auth, Experiment, Source, Trend)
+│   │   │   └── Auth/LoginController.php
+│   │   ├── Http/Resources/            — serializadores JSON (Trend, ScrapeRun, CommercialOpportunity)
+│   │   ├── Jobs/                      — colas: RunExperimentJob, CalculateScoresJob,
+│   │   │                                 ForecastChileTrendJob, ProcessDocumentJob
+│   │   ├── Livewire/                  — componentes de UI reactivos
+│   │   │   ├── ChileFashionRadar.php  — dashboard principal ("/")
+│   │   │   ├── TrendDashboard.php     — tabla completa de tendencias ("/all-trends")
+│   │   │   ├── TrendDetail.php        — detalle de una tendencia + forecast Chile
+│   │   │   ├── ExperimentPanel.php    — panel para correr experimentos
+│   │   │   └── ProductDeepDive.php    — detalle de producto
+│   │   ├── Models/                    — modelos Eloquent (uno por tabla: Brand, Trend,
+│   │   │                                 TrendPrediction, Source, RawDocument, etc.)
+│   │   ├── Services/PythonEngineClient.php — cliente HTTP hacia el motor Python
+│   │   └── Providers/AppServiceProvider.php
+│   ├── config/fashion.php             — configuración central (scraping, proveedores, forecast)
+│   ├── database/
+│   │   ├── migrations/                — 14 migraciones (esquema de toda la BD)
+│   │   └── seeders/                   — datos iniciales
+│   │       ├── SourceSeeder.php        — fuentes de datos + targets (Reddit, Web, Instagram)
+│   │       ├── ScoringParameterSeeder.php — pesos configurables de scoring/forecast
+│   │       ├── PromptVersionSeeder.php — prompts versionados para el LLM
+│   │       ├── StreetwearChileEspanaKnowledgeSeeder.php — hechos reales de marcas (informe usuario)
+│   │       ├── CountrySeeder / NicheSeeder / ColorSeeder / etc. — catálogos base
+│   │       └── DemoChileForecastSeeder.php — datos demo marcados explícitamente como tal
+│   ├── resources/views/livewire/       — templates Blade de cada componente Livewire
+│   ├── routes/web.php                  — rutas ("/" = radar Chile, "/all-trends" = tabla)
+│   ├── data-engine/                    — carpeta vacía (scaffold sin usar, ignorar)
+│   └── tests/                          — tests de Laravel
+│
+├── python/                             — MOTOR PYTHON (FastAPI, scraping, NLP, scoring, forecasting)
+│   ├── api/
+│   │   ├── main.py                     — arranque de FastAPI
+│   │   └── routes/
+│   │       ├── experiments.py          — orquesta el pipeline completo de un experimento
+│   │       ├── trends.py               — endpoints de tendencias + forecast Chile
+│   │       └── products.py             — endpoints de productos
+│   ├── scrapers/
+│   │   ├── base.py                     — utilidades comunes de scraping
+│   │   ├── google_trends.py            — interés de búsqueda por país (pytrends)
+│   │   ├── web.py                      — scraping de medios de moda (URLs configuradas)
+│   │   └── reddit.py                   — scraping Reddit (deshabilitado por política)
+│   │                                      (Instagram: sin integración de API/scraping — solo
+│   │                                      entra vía import_manual_instagram.py, ver más abajo)
+│   ├── nlp/
+│   │   ├── entity_extractor.py         — extrae marcas/productos/colores/tendencias vía LLM
+│   │   ├── product_extractor.py        — extracción específica de productos
+│   │   └── product_pipeline.py         — pipeline de productos
+│   ├── scoring/momentum.py             — cálculo de momentum, growth, death probability, etc.
+│   ├── forecasting/
+│   │   ├── chile_transfer.py           — forecast explicable de adopción en Chile a 60 días
+│   │   └── backtest.py                 — backtest histórico de predicciones
+│   ├── llm/
+│   │   ├── client.py                   — cliente Ollama/LLM local
+│   │   └── creative_director.py        — genera conceptos de producto vía LLM
+│   ├── db/client.py                    — conexión asyncpg a PostgreSQL
+│   ├── ml/                             — vacío, reservado para modelos entrenados a futuro
+│   ├── scripts/
+│   │   └── import_manual_instagram.py  — importador de datos de Instagram transcritos a mano
+│   ├── data/
+│   │   ├── instagram_manual_seed_targets.json — plantilla de marcas/creadores para investigar
+│   │   └── instagram_usernames_verified.txt   — usernames de IG verificados por búsqueda web
+│   ├── requirements.txt                — dependencias Python
+│   └── .env / .env.example             — configuración (API keys, DB, flags de scraping)
+│
+└── .claude/                             — configuración local de Claude Code (no es parte del proyecto)

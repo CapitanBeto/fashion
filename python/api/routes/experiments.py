@@ -30,11 +30,6 @@ from scrapers.web import (
     get_web_targets,
     scrape_web_targets,
 )
-
-from scrapers.instagram import (
-    get_instagram_targets,
-    scrape_instagram_targets,
-)
 from scoring.momentum import (
     calculate_convergence_score,
     calculate_death_probability,
@@ -308,66 +303,9 @@ async def run_experiment(body: ExperimentConfig, request: Request):
             """,
             trend_id, datetime.now().date(), mention_total["cnt"],
         )
-    # ─────────────────────────────────────────────────────────────────────────
-    # STEP 3.5 — Instagram via fashion-data-api (personal, local, manually
-    # populated — see python/scrapers/fashionapi.py)
-    # ─────────────────────────────────────────────────────────────────────────
-
-    logger.info(f"[{key}] Step 3.5/5: Instagram via fashion-data-api")
-
-    try:
-        instagram_source = await fetchrow(
-            """
-            SELECT id, config
-            FROM sources
-            WHERE slug = 'fashion-data-api'
-            AND active = true
-            LIMIT 1
-            """
-        )
-
-        if instagram_source:
-            instagram_targets = await get_instagram_targets(
-                niche_id=niche_id,
-                source_id=instagram_source["id"],
-            )
-
-            if instagram_targets:
-                instagram_stats = await scrape_instagram_targets(
-                    targets=instagram_targets,
-                    scrape_run_id=run_id,
-                    source_id=instagram_source["id"],
-                    max_posts_per_account=cfg.get(
-                        "instagram_posts_per_account",
-                        20,
-                    ),
-                )
-
-                docs_scraped += instagram_stats["posts_saved"]
-
-                if instagram_stats["posts_saved"] > 0:
-                    sources_used.append("instagram")
-
-                logger.info(
-                    f"[{key}] Instagram: {instagram_stats}"
-                )
-
-            else:
-                logger.info(
-                    f"[{key}] Instagram skipped: "
-                    "no instagram_account source_targets configured"
-                )
-
-        else:
-            logger.info(
-                f"[{key}] Instagram skipped: "
-                "'fashion-data-api' source not active/seeded"
-            )
-
-    except Exception as e:
-        logger.exception(
-            f"[{key}] Instagram scraping failed: {e}"
-        )
+    # Instagram has no automated fetch step. It only enters the system via
+    # python/scripts/import_manual_instagram.py, run by hand against data the
+    # user typed after viewing profiles in the app (source 'instagram-manual').
     # ─────────────────────────────────────────────────────────────────────────
     # STEP 4 — Scoring + Creative Director
     # ─────────────────────────────────────────────────────────────────────────

@@ -60,18 +60,15 @@ class SourceSeeder extends Seeder
                 'active'            => false,
             ],
             [
-                'name'              => 'Fashion Data API (Instagram — personal, local)',
-                'slug'              => 'fashion-data-api',
-                'type'              => 'fashion_data_api',
-                'reliability_score' => 60,
-                'config'            => json_encode([
-                    'posts_per_account' => 20,
-                ]),
-                // Backed by python/scrapers/fashionapi.py, which calls the
-                // user's own local server (FASHION_DATA_API_URL) serving
-                // manually-collected Instagram data — no third-party
-                // scraping/bot-evasion service involved.
-                'active'             => true,
+                'name'              => 'Instagram (manual transcription)',
+                'slug'              => 'instagram-manual',
+                'type'              => 'manual_import',
+                'reliability_score' => 90,
+                'config'            => json_encode([]),
+                // Populated by python/scripts/import_manual_instagram.py
+                // from python/data/manual_instagram_import.json — data the
+                // user typed by hand after viewing profiles in the app.
+                'active'            => true,
             ],
         ];
 
@@ -86,9 +83,6 @@ class SourceSeeder extends Seeder
         $redditId       = DB::table('sources')->where('slug', 'reddit')->value('id');
         $googleTrendsId = DB::table('sources')->where('slug', 'google-trends')->value('id');
         $webCrawlerId   = DB::table('sources')->where('slug', 'web-crawler')->value('id');
-        $instagramId = DB::table('sources')
-            ->where('slug', 'fashion-data-api')
-            ->value('id');
         $streetwearNicheId = DB::table('niches')->where('slug', 'streetwear')->value('id');
         $usId  = DB::table('countries')->where('iso2', 'US')->value('id');
         $gbId  = DB::table('countries')->where('iso2', 'GB')->value('id');
@@ -197,41 +191,8 @@ class SourceSeeder extends Seeder
             );
         }
 
-        // Instagram accounts, via fashion-data-api. Only handles actually
-        // confirmed as Instagram usernames (from fashion-influencer
-        // ranking sites) are seeded here — the TikTok-only handles seen
-        // for Stodak/Treino are NOT included since their Instagram handle
-        // was never confirmed.
-        $instagramAccounts = [
-            ['handle' => 'vedelia_donoso',    'priority' => 90],
-            ['handle' => 'ayllenoliver',      'priority' => 85],
-            ['handle' => 'judequeker_',       'priority' => 80],
-            ['handle' => 'ivetteespinozab',   'priority' => 75],
-            ['handle' => 'javicorreamedina',  'priority' => 70],
-        ];
-
-        foreach ($instagramAccounts as $account) {
-            DB::table('source_targets')->updateOrInsert(
-                [
-                    'source_id'    => $instagramId,
-                    'target_type'  => 'instagram_account',
-                    'target_value' => $account['handle'],
-                ],
-                [
-                    'source_id'    => $instagramId,
-                    'niche_id'     => $streetwearNicheId,
-                    'country_id'   => $clId,
-                    'target_type'  => 'instagram_account',
-                    'target_value' => $account['handle'],
-                    'priority'     => $account['priority'],
-                    'frequency'    => 'daily',
-                    'depth'        => 1,
-                    'active'       => true,
-                    'config'       => json_encode(['posts_per_run' => 20]),
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ]
-            );
-        }
+        // No source_targets for Instagram: it has no automated fetch step.
+        // Data enters only via python/scripts/import_manual_instagram.py,
+        // run by hand against a file the user writes directly.
     }
 }

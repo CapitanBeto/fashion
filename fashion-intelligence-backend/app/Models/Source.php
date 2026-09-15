@@ -17,8 +17,8 @@ class Source extends Model
         'active' => 'boolean',
     ];
 
-    // google_trends | reddit | web | apify | scraperapi | zyte | oxylabs | decodo | fashionapi
-    const TYPES = ['google_trends', 'reddit', 'web', 'apify', 'scraperapi', 'zyte', 'oxylabs', 'decodo', 'fashionapi'];
+    // google_trends | reddit | web | apify | scraperapi | zyte | oxylabs | decodo | manual_import
+    const TYPES = ['google_trends', 'reddit', 'web', 'apify', 'scraperapi', 'zyte', 'oxylabs', 'decodo', 'manual_import'];
 
     public function targets(): HasMany
     {
